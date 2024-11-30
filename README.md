@@ -1,5 +1,6 @@
+![gophers synchronizing documents](./resources/images/go_sync.png)
 # emailsync
-This project demonstrate how to syncronizes a list of emails from a MockAPI to a MailChimp List in Go.
+This project creates an API to syncronize a list of emails from a MockAPI to a MailChimp List in Go.
 
 ## Technical Design
 
