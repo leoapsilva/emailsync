@@ -1,0 +1,46 @@
+openapi: '3.0.2'
+info:
+  title: emailsync API
+  version: '1.0'
+servers:
+  - url: http://localhost:6345
+tags:
+  - name: Contacts
+    description: API endpoints for contacts  
+paths:
+  /contacts/sync:
+    get:
+      tags:
+        - Contacts
+      description: Sync the contacts from MockAPI to MailChimp
+      responses:
+        '200':
+          description: Successful sync
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - syncedContacts
+                  - contacts
+                properties:
+                  syncedContacts:
+                    type: number
+                  contacts:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - firstName
+                        - lastName
+                        - email
+                      properties:
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        email:
+                          type: string
+
+    
+                      

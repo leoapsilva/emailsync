@@ -23,3 +23,14 @@ go.work.sum
 
 # env file
 .env
+
+#build directory
+*-build
+
+#node_modules
+*node_modules
+
+#preventing swagger files duplication
+doc/dist
+doc/swagger-initializer.js
+doc/index.html
