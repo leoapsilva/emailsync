@@ -1,6 +1,10 @@
 {
     "routes": [
         {
+            "src": "/",
+            "dest": "/doc/index.html" 
+        },
+        {
             "src": "/.*",
             "dest": "/api/serverless.go" 
         }
