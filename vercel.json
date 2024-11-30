@@ -1,13 +1,5 @@
 {
-
-    "builds": [
-          { "src": "*.html", "use": "@vercel/static" }
-    ],
     "routes": [
-        {
-            "src": "/doc",
-            "dest": "/doc/index.html" 
-        },
         {
             "src": "/contacts/(.*)",
             "dest": "/api/serverless.go" 
