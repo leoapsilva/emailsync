@@ -12,5 +12,5 @@ func main() {
 	log.Info("Starting web server...")
 	api := &api.API{Echo: echo.New()}
 	log.Info("[Success] Web server started.")
-	api.LoadDefault().StartAPI()
+	api.LoadDefault().StartLocalAPI()
 }
