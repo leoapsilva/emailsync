@@ -1,4 +1,4 @@
-package core
+package api
 
 import (
 	"emailsync/config"
@@ -24,7 +24,7 @@ func (api *API) LoadDefault() *API {
 	api.HideBanner = true
 	api.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Output: log.StandardLogger().Out,
 		CustomTimeFormat: "2006-01-02 15:04:05.00000",
-		Format: `[${time_custom}] [ECHO ] [core/server.go:0] [id=${id}] [remote_ip=${remote_ip}] ` +
+		Format: `[${time_custom}] [ECHO ] [api/index.go:0] [id=${id}] [remote_ip=${remote_ip}] ` +
 			`[status=${status}] [error=${error}] [protocol=${protocol}] [agent=${user_agent}] ` +
 			`[latency=${latency}] [latency_human=${latency_human}] [bytes_in=${bytes_in}] ` +
 			`[bytes_out=${bytes_out}] – ${method} ${host}${uri}` + "\n"}))
