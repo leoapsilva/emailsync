@@ -6,7 +6,10 @@
   },
   "servers": [
     {
-      "url": "https://localhostemailsync-ochre.vercel.app"
+      "url": "http://localhost:6345"
+    },
+    {
+      "url": "https://emailsync-ochre.vercel.app"
     }
   ],
   "tags": [

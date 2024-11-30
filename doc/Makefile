@@ -17,7 +17,7 @@ build:
 deploy:
 	mkdir -p ../${PRODUCTION_DIR} && \
 	mkdir -p ../${PRODUCTION_DIR}/doc && \
-	cp -R ./openapi/dist ../${PRODUCTION_DIR}/doc && \
-	cp ./openapi/swagger-initializer.js ../${PRODUCTION_DIR}/doc && \
-	cp ./openapi/index.html ../${PRODUCTION_DIR}/doc && \
+	cp -R ./dist ../${PRODUCTION_DIR}/doc && \
+	cp ./swagger-initializer.js ../${PRODUCTION_DIR}/doc && \
+	cp ./index.html ../${PRODUCTION_DIR}/doc && \
 	cp ./${BINARY}.json ../${PRODUCTION_DIR}/doc

@@ -4,6 +4,7 @@ info:
   version: '1.0'
 servers:
   - url: http://localhost:6345
+  - url: https://emailsync-ochre.vercel.app
 tags:
   - name: Contacts
     description: API endpoints for contacts  

@@ -5,7 +5,7 @@
             "dest": "/doc/index.html" 
         },
         {
-            "src": "/(.*)",
+            "src": "/contacts/(.*)",
             "dest": "/api/serverless.go" 
         }
     ]
