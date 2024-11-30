@@ -7,9 +7,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func ConfigEndpoints(g *echo.Group) {
-	log.Info("ConfigEndpoints")
-	contacts.ConfigEndpoints(g)
+func ConfigServerEndpoints(g *echo.Group) {
+	log.Info("ConfigServerEndpoints")
+	contacts.ConfigServerEndpoints(g)
 	// For OpenAPI Swagger
 	g.Static("/doc", "./doc")
 }

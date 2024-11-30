@@ -8,7 +8,6 @@ const (
 	RouteContactsSync string = "/contacts/sync"
 )
 
-func ConfigEndpoints(g *echo.Group) {
+func ConfigServerEndpoints(g *echo.Group) {
 	g.GET(RouteContactsSync, Sync)
-
 }
