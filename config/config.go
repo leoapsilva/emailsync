@@ -18,7 +18,7 @@ func ConfigEnvVariable(key string) string {
 	value, ok := viper.Get(key).(string)
 
 	if !ok {
-		log.Fatalf("Invalid type assertion")
+		log.Fatalf("Invalid type assertion: Key [%s] not found on environment variables (%s)", key, viper.GetViper().ConfigFileUsed())
 	}
 
 	return value

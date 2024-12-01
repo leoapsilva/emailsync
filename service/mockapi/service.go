@@ -1,0 +1,5 @@
+package mockapi
+
+func GetLisContacts() {
+
+}
