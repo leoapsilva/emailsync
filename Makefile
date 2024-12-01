@@ -17,12 +17,18 @@ install:
 	go mod tidy
 
 build:
-	go build ${LDFLAGS} -o ${BINARY}-${GOARCH}-${GOARCH}.exe
+	go build ${LDFLAGS} -o ${BINARY}-${GOOS}-${GOARCH}.exe
 
 deploy:
 	mkdir -p ./${PRODUCTION_DIR} && \
 	cp ./.env ./${PRODUCTION_DIR} && \
-	cp ./${BINARY}-${GOARCH}-${GOARCH}.exe ./${PRODUCTION_DIR} && \
+	cp ./${BINARY}-${GOOS}-${GOARCH}.exe ./${PRODUCTION_DIR} && \
 	cd ./doc && \
-	make
+	make && \
+	cd -
 
+clean:
+	rm -rf ./${PRODUCTION_DIR} && \
+	rm -rf ${BINARY}-${GOOS}-${GOARCH}.exe && \
+	cd ./doc && \
+	make clean

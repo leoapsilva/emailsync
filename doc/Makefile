@@ -21,3 +21,6 @@ deploy:
 	cp ./swagger-initializer.js ../${PRODUCTION_DIR}/doc && \
 	cp ./index.html ../${PRODUCTION_DIR}/doc && \
 	cp ./${BINARY}.json ../${PRODUCTION_DIR}/doc
+
+clean: 
+	rm -rf ${BINARY}.json
