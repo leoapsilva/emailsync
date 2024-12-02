@@ -1,13 +1,33 @@
 package service
 
 import (
+	"context"
 	"crypto/tls"
 	"emailsync/model"
+	"encoding/json"
 	"net/http"
 	"time"
 
 	resty "github.com/go-resty/resty/v2"
+	"github.com/labstack/gommon/log"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	Timeout20ms  time.Duration = 20 * time.Millisecond
+	Timeout50ms                = 50 * time.Millisecond
+	Timeout200ms               = 200 * time.Millisecond
+	Timeout500ms               = 500 * time.Millisecond
+	Timeout600ms               = 600 * time.Millisecond
+	Timeout1s                  = 1 * time.Second
+	Timeout2s                  = 2 * time.Second
+	Timeout5s                  = 5 * time.Second
+	Timeout10s                 = 10 * time.Second
+	Timeout20s                 = 20 * time.Second
+	Timeout30s                 = 30 * time.Second
+	Timeout60s                 = 60 * time.Second
+	Timeout2M                  = 2 * time.Minute
+	Timeout3M                  = 3 * time.Minute
 )
 
 type ServiceAPI struct {
@@ -33,6 +53,11 @@ func (p *ServiceAPI) SetConnection(con model.Connection) *ServiceAPI {
 	p.con = con
 	return p
 }
+
+func DefaultRetryCondition(r *resty.Response, err error) bool {
+	return false
+}
+
 func (p *ServiceAPI) SetAPI(transport *http.Transport) *ServiceAPI {
 	p.api = resty.New()
 	p.api = p.api.SetTransport(transport)
@@ -54,4 +79,52 @@ func newApi() *ServiceAPI {
 		TLSClientConfig:     &tls.Config{InsecureSkipVerify: false},
 	})
 	return &s
+}
+
+func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (retorno json.RawMessage, err error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
+	defer func() { cancel() }()
+
+	p.api.RetryConditions = nil
+	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
+
+	resp, err := p.api.R().SetHeader("Content-Type", "application/json;charset=UTF-8").
+		SetBody(payload).
+		SetError(&err).
+		SetResult(&retorno).
+		SetContext(ctx).
+		Post(p.con.FormatURL(endpoint))
+
+	if resp.StatusCode() != http.StatusOK {
+		if err != nil {
+			log.Error("Error on POST [" + err.Error() + "]")
+		}
+	}
+
+	return resp.Body(), err
+}
+
+func (p *ServiceAPI) Get(endpoint string, payload json.RawMessage) (retorno json.RawMessage, err error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
+	defer func() { cancel() }()
+
+	p.api.RetryConditions = nil
+	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
+
+	resp, err := p.api.R().SetHeader("Content-Type", "application/json;charset=UTF-8").
+		SetBody(payload).
+		SetError(&err).
+		SetResult(&retorno).
+		SetContext(ctx).
+		Get(p.con.FormatURL(endpoint))
+
+	if resp.StatusCode() != http.StatusOK {
+		if err != nil {
+			log.Error("Error on GET [" + err.Error() + "]")
+		}
+	}
+
+	return resp.Body(), err
 }

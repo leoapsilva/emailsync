@@ -1,6 +1,6 @@
 package model
 
 type SyncResponse struct {
-	SyncedContacts int32     `json:"syncedContacts"`
+	SyncedContacts int       `json:"syncedContacts"`
 	Contacts       []Contact `json:"contacts"`
 }

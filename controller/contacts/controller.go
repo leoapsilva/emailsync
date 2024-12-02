@@ -1,7 +1,9 @@
 package contacts
 
 import (
-	"emailsync/config"
+	"emailsync/model"
+	"emailsync/service/mockapi"
+	"encoding/json"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -11,8 +13,24 @@ import (
 func Sync(c echo.Context) error {
 	log.Info("Sync")
 
-	contactsEndpoint := config.GetEnvVariable("CONTACTS_ENDPOINT")
-	log.Infof("Getting the contacts from %s to sync", contactsEndpoint)
+	var syncResponse model.SyncResponse
 
-	return c.JSON(http.StatusOK, nil)
+	mockAPIMapContacts, err := mockapi.GetListContacts()
+	if err != nil {
+		log.Error(err)
+		return c.JSON(http.StatusServiceUnavailable, nil)
+	}
+
+	syncResponse.SyncedContacts = mockAPIMapContacts.Length()
+	for _, contact := range *mockAPIMapContacts {
+		syncResponse.Contacts = append(syncResponse.Contacts, contact)
+	}
+
+	response, err := json.Marshal(syncResponse)
+	if err != nil {
+		log.Error(err)
+		return c.JSON(http.StatusServiceUnavailable, nil)
+	}
+
+	return c.JSON(http.StatusOK, response)
 }

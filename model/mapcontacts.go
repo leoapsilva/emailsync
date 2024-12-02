@@ -15,3 +15,7 @@ func (thisMap *MapContacts) SetDifference(otherMap *MapContacts) *MapContacts {
 
 	return &setDifference
 }
+
+func (m *MapContacts) Length() int {
+	return len(map[string]Contact(*m))
+}
