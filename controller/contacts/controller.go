@@ -32,5 +32,5 @@ func Sync(c echo.Context) error {
 		return c.JSON(http.StatusServiceUnavailable, nil)
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, json.RawMessage(response))
 }
