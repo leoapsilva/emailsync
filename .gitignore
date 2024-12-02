@@ -26,3 +26,6 @@ go.work.sum
 
 #node_modules
 *node_modules
+
+#.bkp draw.io
+*.bkp
