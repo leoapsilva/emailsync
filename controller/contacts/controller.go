@@ -11,7 +11,7 @@ import (
 func Sync(c echo.Context) error {
 	log.Info("Sync")
 
-	contactsEndpoint := config.ConfigEnvVariable("CONTACTS_ENDPOINT")
+	contactsEndpoint := config.GetEnvVariable("CONTACTS_ENDPOINT")
 	log.Infof("Getting the contacts from %s to sync", contactsEndpoint)
 
 	return c.JSON(http.StatusOK, nil)

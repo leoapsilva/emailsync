@@ -1,6 +1,7 @@
 package api
 
 import (
+	"emailsync/config"
 	"emailsync/controller"
 	"net/http"
 
@@ -33,6 +34,7 @@ func LoadVercel(server *echo.Echo) *echo.Echo {
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	log.Info("Vercel HTTP Handler")
+	config.LoadEnvVariables()
 
 	e := echo.New()
 	srv = LoadVercel(e)

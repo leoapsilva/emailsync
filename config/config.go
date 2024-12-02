@@ -1,25 +1,16 @@
 package config
 
-import (
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-)
+import "os"
 
-func ConfigEnvVariable(key string) string {
+func LoadEnvVariables() {
+	os.Setenv("PORT", "6345")
+	os.Setenv("CONTACTS_ENDPOINT", "https://challenge.trio.dev/api/v1/contacts")
+	os.Setenv("MAILCHIMP_API_KEY", "755380e5c4e7fe0534e0460c2fadfa9f-us9")
+	os.Setenv("MAILCHIMP_URL", "https://https://us9.admin.mailchimp.com")
+	os.Setenv("MAILCHIMP_LIST_NAME", "Leonardo Alves de Paula e Silva")
+	os.Setenv("MAILCHIMP_LIST_ID", "5c2f756353")
+}
 
-	viper.SetConfigFile(".env")
-
-	err := viper.ReadInConfig()
-
-	if err != nil {
-		log.Fatalf("Error while reading config file %s", err)
-	}
-
-	value, ok := viper.Get(key).(string)
-
-	if !ok {
-		log.Fatalf("Invalid type assertion: Key [%s] not found on environment variables (%s)", key, viper.GetViper().ConfigFileUsed())
-	}
-
-	return value
+func GetEnvVariable(key string) string {
+	return os.Getenv(key)
 }
