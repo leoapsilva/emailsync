@@ -1,0 +1,6 @@
+PORT="6345"
+CONTACTS_ENDPOINT="https://challenge.trio.dev/api/v1/contacts"
+MAILCHIMP_API_KEY="755380e5c4e7fe0534e0460c2fadfa9f-us9"
+MAILCHIMP_URL="https://https://us9.admin.mailchimp.com"
+MAILCHIMP_LIST_NAME="Leonardo Alves de Paula e Silva"
+MAILCHIMP_LIST_ID="5c2f756353"
