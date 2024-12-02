@@ -2,6 +2,7 @@ package contacts
 
 import (
 	"emailsync/model"
+	"emailsync/service/mailchimp"
 	"emailsync/service/mockapi"
 	"encoding/json"
 	"net/http"
@@ -14,15 +15,24 @@ func Sync(c echo.Context) error {
 	log.Info("Sync")
 
 	var syncResponse model.SyncResponse
+	var setDifference *model.MapContacts
 
-	mockAPIMapContacts, err := mockapi.GetListContacts()
+	mockAPIMapContacts, err := mockapi.GetMapContacts()
 	if err != nil {
 		log.Error(err)
 		return c.JSON(http.StatusServiceUnavailable, nil)
 	}
 
-	syncResponse.SyncedContacts = mockAPIMapContacts.Length()
-	for _, contact := range *mockAPIMapContacts {
+	mailChimpMapContacts, err := mailchimp.GetMapContacts()
+	if err != nil {
+		log.Error(err)
+		return c.JSON(http.StatusServiceUnavailable, nil)
+	}
+
+	setDifference = mockAPIMapContacts.SetDifference(mailChimpMapContacts)
+
+	syncResponse.SyncedContacts = setDifference.Length()
+	for _, contact := range *setDifference {
 		syncResponse.Contacts = append(syncResponse.Contacts, contact)
 	}
 

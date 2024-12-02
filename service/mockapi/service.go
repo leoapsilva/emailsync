@@ -9,8 +9,25 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func GetListContacts() (*model.MapContacts, error) {
-	log.Info("GetListContacts")
+func GetMapContacts() (*model.MapContacts, error) {
+	log.Info("GetMapContacts")
+
+	mockAPIListContacts, err := getListContacts()
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	retMapContacts := mockAPIListContacts.ToMapContacts()
+
+	log.Infof("Got [%d] contacts", retMapContacts.Length())
+	log.Debugf("Got [%d] contacts: %v", retMapContacts.Length(), *retMapContacts)
+
+	return retMapContacts, nil
+}
+
+func getListContacts() (*model.MockAPIListContacts, error) {
+	log.Info("getListContacts")
 
 	var mockAPIListContacts model.MockAPIListContacts
 	mockAPIURL := config.GetEnvVariable("MOCK_API_URL")
@@ -32,10 +49,5 @@ func GetListContacts() (*model.MapContacts, error) {
 		return nil, err
 	}
 
-	retMapContacts := mockAPIListContacts.ToMapContacts()
-
-	log.Infof("Got [%d] contacts", retMapContacts.Length())
-	log.Debugf("Got [%d] contacts: %v", retMapContacts.Length(), *retMapContacts)
-
-	return retMapContacts, nil
+	return &mockAPIListContacts, nil
 }

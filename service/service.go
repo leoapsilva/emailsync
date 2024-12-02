@@ -66,6 +66,11 @@ func (p *ServiceAPI) SetAPI(transport *http.Transport) *ServiceAPI {
 	return p
 }
 
+func (p *ServiceAPI) SetBasicAuth(user string, password string) *ServiceAPI {
+	p.api.SetBasicAuth(user, password)
+	return p
+}
+
 func NewWithConnection(con model.Connection) *ServiceAPI {
 	return newApi().SetConnection(con)
 }
