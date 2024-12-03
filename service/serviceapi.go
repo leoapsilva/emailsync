@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"emailsync/model"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
@@ -101,10 +102,13 @@ func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (retorno jso
 		SetContext(ctx).
 		Post(p.con.FormatURL(endpoint))
 
-	if resp.StatusCode() != http.StatusOK {
+	statusCode := resp.StatusCode()
+	if statusCode != http.StatusOK {
 		if err != nil {
 			log.Error("Error on POST [" + err.Error() + "]")
+			return resp.Body(), err
 		}
+		return resp.Body(), errors.New("status != OK")
 	}
 
 	return resp.Body(), err
@@ -125,10 +129,67 @@ func (p *ServiceAPI) Get(endpoint string, payload json.RawMessage) (retorno json
 		SetContext(ctx).
 		Get(p.con.FormatURL(endpoint))
 
-	if resp.StatusCode() != http.StatusOK {
+	statusCode := resp.StatusCode()
+	if statusCode != http.StatusOK {
 		if err != nil {
 			log.Error("Error on GET [" + err.Error() + "]")
+			return resp.Body(), err
 		}
+		return resp.Body(), errors.New("status != OK")
+	}
+
+	return resp.Body(), err
+}
+
+func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage) (retorno json.RawMessage, err error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
+	defer func() { cancel() }()
+
+	p.api.RetryConditions = nil
+	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
+
+	resp, err := p.api.R().SetHeader("Content-Type", "application/json;charset=UTF-8").
+		SetBody(payload).
+		SetError(&err).
+		SetResult(&retorno).
+		SetContext(ctx).
+		Put(p.con.FormatURL(endpoint))
+
+	statusCode := resp.StatusCode()
+	if statusCode != http.StatusOK {
+		if err != nil {
+			log.Error("Error on PUT [" + err.Error() + "]")
+			return resp.Body(), err
+		}
+		return resp.Body(), errors.New("status != OK")
+	}
+
+	return resp.Body(), err
+}
+
+func (p *ServiceAPI) Delete(endpoint string, payload json.RawMessage) (retorno json.RawMessage, err error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
+	defer func() { cancel() }()
+
+	p.api.RetryConditions = nil
+	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
+
+	resp, err := p.api.R().SetHeader("Content-Type", "application/json;charset=UTF-8").
+		SetBody(payload).
+		SetError(&err).
+		SetResult(&retorno).
+		SetContext(ctx).
+		Delete(p.con.FormatURL(endpoint))
+
+	statusCode := resp.StatusCode()
+	if statusCode != http.StatusOK {
+		if err != nil {
+			log.Error("Error on DELETE [" + err.Error() + "]")
+			return resp.Body(), err
+		}
+		return resp.Body(), errors.New("status != OK")
 	}
 
 	return resp.Body(), err

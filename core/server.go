@@ -23,6 +23,7 @@ func (server *Server) LoadDefault() *Server {
 	config.LoadEnvVariables()
 	server.Debug = true
 	server.HideBanner = true
+	log.SetReportCaller(true)
 	server.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Output: log.StandardLogger().Out,
 		CustomTimeFormat: "2006-01-02 15:04:05.00000",
 		Format: `[${time_custom}] [ECHO ] [api/server.go:0] [id=${id}] [remote_ip=${remote_ip}] ` +
