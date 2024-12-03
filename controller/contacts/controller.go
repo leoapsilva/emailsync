@@ -25,9 +25,7 @@ func Sync(c echo.Context) error {
 
 	added := 0
 
-	setDifference = mockAPIMapContacts
-
-	for _, contact := range *setDifference {
+	for _, contact := range *mockAPIMapContacts {
 		errorResponse := mailchimp.AddContact(&contact)
 
 		if errorResponse != nil {
