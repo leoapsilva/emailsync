@@ -11,7 +11,7 @@ Please refer to the [Techincal Design](https://docs.google.com/document/d/1Ux-Ch
 The directory ``/doc`` is a OpenAPI specification of the API of **emailsync**.
 
 You can access the API documentation and use it as a client when your service is running:
- - just type the service URL + ``/doc`` on your browser.
+ - just type the service URL + ``/doc`` on your browser (when running on your local machine).
 
 You also can use OpenAPI specs in a variety of ways:
 - Using as a test client on VS Code
