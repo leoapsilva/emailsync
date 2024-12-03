@@ -46,3 +46,25 @@ func Test_addListMember(t *testing.T) {
 		})
 	}
 }
+
+func TestArchiveAllMembers(t *testing.T) {
+	config.LoadEnvVariables()
+
+	tests := []struct {
+		name string
+		want *model.ErrorResponse
+	}{
+		{
+			name: "Archiving all the contacts",
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ArchiveAllMembers()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ArchiveAllMembers() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

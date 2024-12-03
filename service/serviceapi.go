@@ -177,19 +177,21 @@ func (p *ServiceAPI) Delete(endpoint string, payload json.RawMessage) (retorno j
 	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
 
 	resp, err := p.api.R().SetHeader("Content-Type", "application/json;charset=UTF-8").
-		SetBody(payload).
 		SetError(&err).
 		SetResult(&retorno).
 		SetContext(ctx).
 		Delete(p.con.FormatURL(endpoint))
+		// SetBody(payload).
 
-	statusCode := resp.StatusCode()
-	if statusCode != http.StatusOK {
-		if err != nil {
-			log.Error("Error on DELETE [" + err.Error() + "]")
-			return resp.Body(), err
+	if resp != nil {
+		statusCode := resp.StatusCode()
+		if statusCode != http.StatusOK {
+			if err != nil {
+				log.Error("Error on DELETE [" + err.Error() + "]")
+				return resp.Body(), err
+			}
+			return resp.Body(), errors.New("status != OK")
 		}
-		return resp.Body(), errors.New("status != OK")
 	}
 
 	return resp.Body(), err

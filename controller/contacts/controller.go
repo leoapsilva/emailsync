@@ -15,7 +15,6 @@ func Sync(c echo.Context) error {
 	log.Info("Sync")
 
 	var syncResponse model.SyncResponse
-	var setDifference *model.MapContacts
 	var syncedContacts model.MapContacts
 
 	mockAPIMapContacts, errorResponse := mockapi.GetMapContacts()
@@ -23,8 +22,9 @@ func Sync(c echo.Context) error {
 		return c.JSON(errorResponse.Status, errorResponse)
 	}
 
-	added := 0
+	syncedContacts = *mockAPIMapContacts
 
+	added := 0
 	for _, contact := range *mockAPIMapContacts {
 		errorResponse := mailchimp.AddContact(&contact)
 
@@ -36,10 +36,10 @@ func Sync(c echo.Context) error {
 		}
 	}
 
-	log.Infof("Synced [%d] from total of [%d]", added, setDifference.Length())
+	log.Infof("Synced [%d] from total of [%d]", added, mockAPIMapContacts.Length())
 
 	syncResponse.SyncedContacts = added
-	for _, contact := range *setDifference {
+	for _, contact := range syncedContacts {
 		syncResponse.Contacts = append(syncResponse.Contacts, contact)
 	}
 

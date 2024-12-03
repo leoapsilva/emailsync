@@ -12,10 +12,8 @@ import (
 )
 
 const (
-	ListMembersEndpoint                       = "/lists/@LIST_ID/members"
-	ListMembersPathParametersCount1000        = "count=1000"
-	ListMembersPathParametersStatusArchieved  = "status=archived"
-	ListMembersPathParametersStatusSubscribed = "status=archived"
+	ListMembersEndpoint       = "/lists/@LIST_ID/members"
+	ListMembersPathParameters = "?count=1000"
 )
 
 func GetErrorResponse(response json.RawMessage) *model.ErrorResponse {
@@ -38,14 +36,14 @@ func SetErrorResponse(detail string, status int, title string) *model.ErrorRespo
 	return e
 }
 
-func getListMembers(pathParameters string) (*model.MailchimpListMembers, *model.ErrorResponse) {
+func getListMembers() (*model.MailchimpListMembers, *model.ErrorResponse) {
 	log.Info("getListContacts")
 
 	var mailchimpListMembers model.MailchimpListMembers
 	APIURL := config.GetEnvVariable("MAILCHIMP_API_URL")
 	endpoint := strings.Replace(ListMembersEndpoint, "@LIST_ID", config.GetEnvVariable("MAILCHIMP_LIST_ID"), -1)
 
-	log.Infof("Getting the list members from %s ...", APIURL+endpoint+"?"+pathParameters)
+	log.Infof("Getting the list members from %s ...", APIURL+endpoint+ListMembersPathParameters)
 
 	mailchimpAPI := service.NewWithConnection(model.Connection{URL: APIURL})
 
@@ -95,6 +93,7 @@ func addListMember(member json.RawMessage) (*model.MailchimpMember, *model.Error
 	mailchimpAPI.SetBasicAuth("user", APIKey)
 
 	response, err := mailchimpAPI.Post(endpoint, member)
+	log.Info(string(response))
 
 	if err != nil {
 		errorResponse := GetErrorResponse(response)
@@ -108,6 +107,7 @@ func addListMember(member json.RawMessage) (*model.MailchimpMember, *model.Error
 	}
 
 	return &mailchimpMember, nil
+
 }
 
 func archiveMember(memberId string) *model.ErrorResponse {
@@ -115,7 +115,7 @@ func archiveMember(memberId string) *model.ErrorResponse {
 	APIURL := config.GetEnvVariable("MAILCHIMP_API_URL")
 	endpoint := strings.Replace(ListMembersEndpoint, "@LIST_ID", config.GetEnvVariable("MAILCHIMP_LIST_ID"), -1)
 
-	log.Infof("Adding list member from %s ...", APIURL+endpoint+"/"+memberId)
+	log.Infof("Archive list member from %s ...", APIURL+endpoint+"/"+memberId)
 
 	mailchimpAPI := service.NewWithConnection(model.Connection{URL: APIURL})
 
@@ -127,7 +127,7 @@ func archiveMember(memberId string) *model.ErrorResponse {
 
 	mailchimpAPI.SetBasicAuth("user", APIKey)
 
-	response, err := mailchimpAPI.Delete(endpoint, json.RawMessage{})
+	response, err := mailchimpAPI.Delete(APIURL+endpoint+"/"+memberId, json.RawMessage{})
 	log.Info(string(response))
 
 	if err != nil {
@@ -177,7 +177,7 @@ func AddContact(contact *model.Contact) *model.ErrorResponse {
 func GetMapContacts() (*model.MapContacts, *model.ErrorResponse) {
 	log.Info("GetMapContacts")
 
-	mailchimpListMembers, errorResponse := getListMembers(ListMembersPathParametersCount1000)
+	mailchimpListMembers, errorResponse := getListMembers()
 	if errorResponse != nil {
 		return nil, errorResponse
 	}
@@ -191,13 +191,13 @@ func GetMapContacts() (*model.MapContacts, *model.ErrorResponse) {
 
 func ArchiveAllMembers() *model.ErrorResponse {
 
-	mailchimpListMembers, errorResponse := getListMembers(ListMembersPathParametersCount1000)
+	mailchimpListMembers, errorResponse := getListMembers()
 	if errorResponse != nil {
 		return errorResponse
 	}
 
 	for _, member := range mailchimpListMembers.Members {
-		errorResponse = archiveMember(member.EmailAddress)
+		errorResponse = archiveMember(member.Id)
 		if errorResponse != nil {
 			return errorResponse
 		}
