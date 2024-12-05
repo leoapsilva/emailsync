@@ -41,9 +41,9 @@ func (server *Server) CreateGroupV1() *Server {
 }
 
 func (server *Server) StartLocalAPI() {
+	config.LoadEnvVariables()
 	log.Infof("Starting service on port [%s]", config.GetEnvVariable("SERVER_PORT"))
 
-	config.LoadEnvVariables()
 	server.Server.Addr = ":" + config.GetEnvVariable("SERVER_PORT")
 	if err := server.Start(server.Server.Addr); err != nil {
 		log.Error(err)

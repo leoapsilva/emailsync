@@ -9,7 +9,6 @@ GOARCH = 386
 GOOS = windows
 LDFLAGS = -ldflags "-s -w -X main.build=DEV"
 VERSION?=?
-ENV_FILE = .env
 
 all: build deploy
 
@@ -21,7 +20,6 @@ build:
 
 deploy:
 	mkdir -p ./${PRODUCTION_DIR} && \
-	cp ./.env ./${PRODUCTION_DIR} && \
 	cp ./${BINARY}-${GOOS}-${GOARCH}.exe ./${PRODUCTION_DIR} && \
 	cd ./doc && \
 	make && \
