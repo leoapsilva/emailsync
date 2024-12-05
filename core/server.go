@@ -20,7 +20,6 @@ func New() *Server {
 }
 
 func (server *Server) LoadDefault() *Server {
-	config.LoadEnvVariables()
 	server.Debug = true
 	server.HideBanner = true
 	log.SetReportCaller(true)
@@ -32,7 +31,6 @@ func (server *Server) LoadDefault() *Server {
 			`[bytes_out=${bytes_out}] – ${method} ${host}${uri}` + "\n"}))
 	server.Use(middleware.Recover())
 	server.Use(middleware.CORS())
-	server.Server.Addr = ":" + config.GetEnvVariable("SERVER_PORT")
 	return server.CreateGroupV1()
 }
 
@@ -44,6 +42,9 @@ func (server *Server) CreateGroupV1() *Server {
 
 func (server *Server) StartLocalAPI() {
 	log.Infof("Starting service on port [%s]", config.GetEnvVariable("SERVER_PORT"))
+
+	config.LoadEnvVariables()
+	server.Server.Addr = ":" + config.GetEnvVariable("SERVER_PORT")
 	if err := server.Start(server.Server.Addr); err != nil {
 		log.Error(err)
 	}
