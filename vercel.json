@@ -1,11 +1,14 @@
 {
     "env": {
-        "PORT": "6345",
-        "CONTACTS_ENDPOINT": "https://challenge.trio.dev/api/v1/contacts",
-        "MAILCHIMP_API_KEY": "NjM2ZjlmOTI4YjkxNjIwOGE3YzU4N2VlOGFkNDQ5MTQtdXM5",
-        "MAILCHIMP_URL": "https://https://us9.admin.mailchimp.com",
+        "SERVER_PORT": "6345",
+        "MOCK_API_URL": "https://challenge.trio.dev/api/v1/",
+        "MOCK_API_CONTACTS_ENDPOINT": "contacts",
+        "MAILCHIMP_API_KEY": "M2I2ZThjYmM5NDQ2MjNiNTBlODQ0NWFkNjdmMDE4NWItdXM5",
+        "MAILCHIMP_API_URL": "https://us9.api.mailchimp.com/3.0",
         "MAILCHIMP_LIST_NAME": "Leonardo Alves de Paula e Silva",
-        "MAILCHIMP_LIST_ID": "5c2f756353"
+        "MAILCHIMP_LIST_ID": "5c2f756353",
+        "MAILCHIMP_MAX_SIMULTANEOS_CONNECTIONS": "10"
+        
     },
     "routes": [
         {
