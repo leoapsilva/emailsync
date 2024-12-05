@@ -15,26 +15,6 @@ const (
 	ListMemberEndpoint  = "/lists/{list_id}/members/{member_id}"
 )
 
-func GetErrorResponse(response json.RawMessage) *model.ErrorResponse {
-	e := new(model.ErrorResponse)
-	err := json.Unmarshal(response, e)
-	if err != nil {
-		e.Detail = err.Error()
-		e.Status = http.StatusInternalServerError
-		e.Title = "Error Unmarshal Error Response"
-		return e
-	}
-	return e
-}
-
-func SetErrorResponse(detail string, status int, title string) *model.ErrorResponse {
-	e := new(model.ErrorResponse)
-	e.Detail = detail
-	e.Status = status
-	e.Title = title
-	return e
-}
-
 func getListMembers() (*model.MailchimpListMembers, *model.ErrorResponse) {
 	log.Info("getListContacts")
 
@@ -47,7 +27,7 @@ func getListMembers() (*model.MailchimpListMembers, *model.ErrorResponse) {
 
 	APIKey, err := config.DecodeBase64(config.GetEnvVariable("MAILCHIMP_API_KEY"))
 	if err != nil {
-		errorResponse := SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error decoding Mailchimp API Key")
+		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error decoding Mailchimp API Key")
 		return nil, errorResponse
 	}
 
@@ -68,13 +48,13 @@ func getListMembers() (*model.MailchimpListMembers, *model.ErrorResponse) {
 	log.Info(string(response))
 
 	if err != nil {
-		errorResponse := GetErrorResponse(response)
+		errorResponse := model.GetErrorResponse(response)
 		return nil, errorResponse
 	}
 
 	err = json.Unmarshal(response, &mailchimpListMembers)
 	if err != nil {
-		errorResponse := SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal Mailchimp List Members")
+		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal Mailchimp List Members")
 		return nil, errorResponse
 	}
 
@@ -92,7 +72,7 @@ func addListMember(member json.RawMessage) (*model.MailchimpMember, *model.Error
 
 	APIKey, err := config.DecodeBase64(config.GetEnvVariable("MAILCHIMP_API_KEY"))
 	if err != nil {
-		errorResponse := SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error decoding Mailchimp API Key")
+		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error decoding Mailchimp API Key")
 		return nil, errorResponse
 	}
 
@@ -107,13 +87,13 @@ func addListMember(member json.RawMessage) (*model.MailchimpMember, *model.Error
 	log.Debug(string(response))
 
 	if err != nil {
-		errorResponse := GetErrorResponse(response)
+		errorResponse := model.GetErrorResponse(response)
 		return nil, errorResponse
 	}
 
 	err = json.Unmarshal(response, &mailchimpMember)
 	if err != nil {
-		errorResponse := SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal Mailchimp Member")
+		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal Mailchimp Member")
 		return nil, errorResponse
 	}
 
@@ -129,7 +109,7 @@ func archiveMember(memberId string) *model.ErrorResponse {
 
 	APIKey, err := config.DecodeBase64(config.GetEnvVariable("MAILCHIMP_API_KEY"))
 	if err != nil {
-		errorResponse := SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error decoding Mailchimp API Key")
+		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error decoding Mailchimp API Key")
 		return errorResponse
 	}
 
@@ -145,7 +125,7 @@ func archiveMember(memberId string) *model.ErrorResponse {
 	log.Debug(string(response))
 
 	if err != nil {
-		errorResponse := GetErrorResponse(response)
+		errorResponse := model.GetErrorResponse(response)
 		return errorResponse
 	}
 
@@ -171,7 +151,7 @@ func AddContact(contact *model.Contact) *model.ErrorResponse {
 
 	payload, err := json.Marshal(member)
 	if err != nil {
-		errorResponse := SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal Mailchimp Member")
+		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal Mailchimp Member")
 		return errorResponse
 	}
 

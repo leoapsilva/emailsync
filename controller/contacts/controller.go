@@ -25,7 +25,7 @@ func Sync(c echo.Context) error {
 
 	response, err := json.Marshal(syncResponse)
 	if err != nil {
-		errorResponse := mailchimp.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Marshal Response")
+		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Marshal Response")
 		return c.JSON(http.StatusInternalServerError, errorResponse)
 	}
 
@@ -68,7 +68,7 @@ func Add(c echo.Context) error {
 
 	err := c.Bind(&listContacts)
 	if err != nil {
-		errorResponse := mailchimp.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal bind")
+		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal bind")
 		return c.JSON(http.StatusInternalServerError, errorResponse)
 	}
 
@@ -78,7 +78,7 @@ func Add(c echo.Context) error {
 
 	response, err := json.Marshal(syncResponse)
 	if err != nil {
-		errorResponse := mailchimp.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Marshal Response")
+		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Marshal Response")
 		return c.JSON(http.StatusInternalServerError, errorResponse)
 	}
 
