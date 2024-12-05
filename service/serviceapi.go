@@ -67,6 +67,26 @@ func (p *ServiceAPI) SetAPI(transport *http.Transport) *ServiceAPI {
 	return p
 }
 
+func (p *ServiceAPI) SetQueryParam(key string, value string) *ServiceAPI {
+	p.api.SetQueryParam(key, value)
+	return p
+}
+
+func (p *ServiceAPI) SetQueryParams(params map[string]string) *ServiceAPI {
+	p.api.SetQueryParams(params)
+	return p
+}
+
+func (p *ServiceAPI) SetPathParam(key string, value string) *ServiceAPI {
+	p.api.SetPathParam(key, value)
+	return p
+}
+
+func (p *ServiceAPI) SetPathParams(params map[string]string) *ServiceAPI {
+	p.api.SetPathParams(params)
+	return p
+}
+
 func (p *ServiceAPI) SetBasicAuth(user string, password string) *ServiceAPI {
 	p.api.SetBasicAuth(user, password)
 	return p
@@ -88,6 +108,7 @@ func newApi() *ServiceAPI {
 }
 
 func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (retorno json.RawMessage, err error) {
+	//func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage, pathParams map[string]string, queryParams map[string]string) (retorno json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
 	defer func() { cancel() }()
@@ -114,7 +135,7 @@ func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (retorno jso
 	return resp.Body(), err
 }
 
-func (p *ServiceAPI) Get(endpoint string, payload json.RawMessage) (retorno json.RawMessage, err error) {
+func (p *ServiceAPI) Get(endpoint string) (retorno json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
 	defer func() { cancel() }()
@@ -123,7 +144,6 @@ func (p *ServiceAPI) Get(endpoint string, payload json.RawMessage) (retorno json
 	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
 
 	resp, err := p.api.R().SetHeader("Content-Type", "application/json;charset=UTF-8").
-		SetBody(payload).
 		SetError(&err).
 		SetResult(&retorno).
 		SetContext(ctx).
@@ -141,7 +161,7 @@ func (p *ServiceAPI) Get(endpoint string, payload json.RawMessage) (retorno json
 	return resp.Body(), err
 }
 
-func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage) (retorno json.RawMessage, err error) {
+func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage, pathParams map[string]string, queryParams map[string]string) (retorno json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
 	defer func() { cancel() }()
@@ -150,6 +170,8 @@ func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage) (retorno json
 	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
 
 	resp, err := p.api.R().SetHeader("Content-Type", "application/json;charset=UTF-8").
+		SetQueryParams(queryParams).
+		SetPathParams(pathParams).
 		SetBody(payload).
 		SetError(&err).
 		SetResult(&retorno).
@@ -168,7 +190,7 @@ func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage) (retorno json
 	return resp.Body(), err
 }
 
-func (p *ServiceAPI) Delete(endpoint string, payload json.RawMessage) (retorno json.RawMessage, err error) {
+func (p *ServiceAPI) Delete(endpoint string, pathParams map[string]string, queryParams map[string]string) (retorno json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
 	defer func() { cancel() }()
@@ -177,11 +199,12 @@ func (p *ServiceAPI) Delete(endpoint string, payload json.RawMessage) (retorno j
 	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
 
 	resp, err := p.api.R().SetHeader("Content-Type", "application/json;charset=UTF-8").
+		SetQueryParams(queryParams).
+		SetPathParams(pathParams).
 		SetError(&err).
 		SetResult(&retorno).
 		SetContext(ctx).
 		Delete(p.con.FormatURL(endpoint))
-		// SetBody(payload).
 
 	if resp != nil {
 		statusCode := resp.StatusCode()

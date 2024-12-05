@@ -6,14 +6,13 @@ import (
 	"emailsync/service"
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	ListMembersEndpoint       = "/lists/@LIST_ID/members"
-	ListMembersPathParameters = "?count=1000"
+	ListMembersEndpoint = "/lists/{list_id}/members"
+	ListMemberEndpoint  = "/lists/{list_id}/members/{member_id}"
 )
 
 func GetErrorResponse(response json.RawMessage) *model.ErrorResponse {
@@ -41,9 +40,8 @@ func getListMembers() (*model.MailchimpListMembers, *model.ErrorResponse) {
 
 	var mailchimpListMembers model.MailchimpListMembers
 	APIURL := config.GetEnvVariable("MAILCHIMP_API_URL")
-	endpoint := strings.Replace(ListMembersEndpoint, "@LIST_ID", config.GetEnvVariable("MAILCHIMP_LIST_ID"), -1)
 
-	log.Infof("Getting the list members from %s ...", APIURL+endpoint+ListMembersPathParameters)
+	log.Infof("Getting the list members from %s ...", APIURL+ListMembersEndpoint)
 
 	mailchimpAPI := service.NewWithConnection(model.Connection{URL: APIURL})
 
@@ -55,7 +53,18 @@ func getListMembers() (*model.MailchimpListMembers, *model.ErrorResponse) {
 
 	mailchimpAPI.SetBasicAuth("user", APIKey)
 
-	response, err := mailchimpAPI.Get(endpoint, json.RawMessage{})
+	pathParams := map[string]string{
+		"list_id": config.GetEnvVariable("MAILCHIMP_LIST_ID"),
+	}
+
+	queryParams := map[string]string{
+		"count": "1000",
+	}
+
+	response, err := mailchimpAPI.SetQueryParams(queryParams).
+		SetPathParams(pathParams).
+		Get(ListMembersEndpoint)
+
 	log.Info(string(response))
 
 	if err != nil {
@@ -78,9 +87,6 @@ func addListMember(member json.RawMessage) (*model.MailchimpMember, *model.Error
 	var mailchimpMember model.MailchimpMember
 
 	APIURL := config.GetEnvVariable("MAILCHIMP_API_URL")
-	endpoint := strings.Replace(ListMembersEndpoint, "@LIST_ID", config.GetEnvVariable("MAILCHIMP_LIST_ID"), -1)
-
-	log.Infof("Adding list member from %s ...", APIURL+endpoint)
 
 	mailchimpAPI := service.NewWithConnection(model.Connection{URL: APIURL})
 
@@ -91,9 +97,14 @@ func addListMember(member json.RawMessage) (*model.MailchimpMember, *model.Error
 	}
 
 	mailchimpAPI.SetBasicAuth("user", APIKey)
+	pathParams := map[string]string{
+		"list_id": config.GetEnvVariable("MAILCHIMP_LIST_ID"),
+	}
 
-	response, err := mailchimpAPI.Post(endpoint, member)
-	log.Info(string(response))
+	response, err := mailchimpAPI.SetPathParams(pathParams).
+		Post(ListMembersEndpoint, member)
+
+	log.Debug(string(response))
 
 	if err != nil {
 		errorResponse := GetErrorResponse(response)
@@ -113,9 +124,6 @@ func addListMember(member json.RawMessage) (*model.MailchimpMember, *model.Error
 func archiveMember(memberId string) *model.ErrorResponse {
 
 	APIURL := config.GetEnvVariable("MAILCHIMP_API_URL")
-	endpoint := strings.Replace(ListMembersEndpoint, "@LIST_ID", config.GetEnvVariable("MAILCHIMP_LIST_ID"), -1)
-
-	log.Infof("Archive list member from %s ...", APIURL+endpoint+"/"+memberId)
 
 	mailchimpAPI := service.NewWithConnection(model.Connection{URL: APIURL})
 
@@ -127,8 +135,14 @@ func archiveMember(memberId string) *model.ErrorResponse {
 
 	mailchimpAPI.SetBasicAuth("user", APIKey)
 
-	response, err := mailchimpAPI.Delete(APIURL+endpoint+"/"+memberId, json.RawMessage{})
-	log.Info(string(response))
+	pathParams := map[string]string{
+		"list_id":   config.GetEnvVariable("MAILCHIMP_LIST_ID"),
+		"member_id": memberId,
+	}
+
+	response, err := mailchimpAPI.Delete(ListMemberEndpoint, pathParams, map[string]string{})
+
+	log.Debug(string(response))
 
 	if err != nil {
 		errorResponse := GetErrorResponse(response)

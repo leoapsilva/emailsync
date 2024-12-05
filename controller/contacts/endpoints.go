@@ -6,8 +6,10 @@ import (
 
 const (
 	RouteContactsSync string = "/contacts/sync"
+	RouteContactsAdd  string = "/contacts/add"
 )
 
 func ConfigServerEndpoints(g *echo.Group) {
 	g.GET(RouteContactsSync, Sync)
+	g.POST(RouteContactsAdd, Add)
 }

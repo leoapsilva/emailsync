@@ -57,7 +57,7 @@ func getListContacts() (*model.MockAPIListContacts, *model.ErrorResponse) {
 
 	mockAPI := service.NewWithConnection(model.Connection{URL: mockAPIURL})
 
-	response, err := mockAPI.Get(contactsEndpoint, json.RawMessage{})
+	response, err := mockAPI.Get(contactsEndpoint)
 	if err != nil {
 		errorResponse := GetErrorResponse(response)
 		return nil, errorResponse
