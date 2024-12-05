@@ -14,34 +14,14 @@ import (
 func Sync(c echo.Context) error {
 	log.Info("Sync")
 
-	var syncResponse model.SyncResponse
-	var syncedContacts model.MapContacts
+	var syncResponse *model.SyncResponse
 
 	mockAPIMapContacts, errorResponse := mockapi.GetMapContacts()
 	if errorResponse != nil {
 		return c.JSON(errorResponse.Status, errorResponse)
 	}
 
-	syncedContacts = *mockAPIMapContacts
-
-	added := 0
-	for _, contact := range *mockAPIMapContacts {
-		errorResponse := mailchimp.AddContact(&contact)
-
-		if errorResponse != nil {
-			log.Errorf("Error on add contact: %s", errorResponse.Detail)
-			delete(syncedContacts, contact.Email)
-		} else {
-			added = added + 1
-		}
-	}
-
-	log.Infof("Synced [%d] from total of [%d]", added, mockAPIMapContacts.Length())
-
-	syncResponse.SyncedContacts = added
-	for _, contact := range syncedContacts {
-		syncResponse.Contacts = append(syncResponse.Contacts, contact)
-	}
+	syncResponse = addContact(mockAPIMapContacts)
 
 	response, err := json.Marshal(syncResponse)
 	if err != nil {
@@ -52,19 +32,10 @@ func Sync(c echo.Context) error {
 	return c.JSON(http.StatusOK, json.RawMessage(response))
 }
 
-func Add(c echo.Context) error {
+func addContact(mockAPIMapContacts *model.MapContacts) *model.SyncResponse {
 
-	var listContacts model.ListContacts
 	var syncedContacts model.MapContacts
 	var syncResponse model.SyncResponse
-
-	err := c.Bind(&listContacts)
-	if err != nil {
-		errorResponse := mailchimp.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal bind")
-		return c.JSON(http.StatusInternalServerError, errorResponse)
-	}
-
-	mockAPIMapContacts := listContacts.ToMapContacts()
 
 	syncedContacts = *mockAPIMapContacts
 
@@ -86,6 +57,24 @@ func Add(c echo.Context) error {
 	for _, contact := range syncedContacts {
 		syncResponse.Contacts = append(syncResponse.Contacts, contact)
 	}
+
+	return &syncResponse
+}
+
+func Add(c echo.Context) error {
+
+	var listContacts model.ListContacts
+	var syncResponse *model.SyncResponse
+
+	err := c.Bind(&listContacts)
+	if err != nil {
+		errorResponse := mailchimp.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal bind")
+		return c.JSON(http.StatusInternalServerError, errorResponse)
+	}
+
+	mockAPIMapContacts := listContacts.ToMapContacts()
+
+	syncResponse = addContact(mockAPIMapContacts)
 
 	response, err := json.Marshal(syncResponse)
 	if err != nil {

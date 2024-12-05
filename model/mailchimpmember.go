@@ -53,7 +53,7 @@ type MailchimpListMembers struct {
 	Members    []MailchimpMember `json:"members"`
 	TotalItens int               `json:"total_items"`
 	ListId     string            `json:"list_id"`
-	Links      json.RawMessage   `json:"_links`
+	Links      json.RawMessage
 }
 
 func (l *MailchimpListMembers) ToMapContacts() *MapContacts {

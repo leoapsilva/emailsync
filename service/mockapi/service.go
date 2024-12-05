@@ -33,7 +33,7 @@ func SetErrorResponse(detail string, status int, title string) *model.ErrorRespo
 func GetMapContacts() (*model.MapContacts, *model.ErrorResponse) {
 	log.Info("GetMapContacts")
 
-	mockAPIListContacts, errorResponse := getListContacts()
+	mockAPIListContacts, errorResponse := GetListContacts()
 	if errorResponse != nil {
 		return nil, errorResponse
 	}
@@ -46,7 +46,7 @@ func GetMapContacts() (*model.MapContacts, *model.ErrorResponse) {
 	return retMapContacts, nil
 }
 
-func getListContacts() (*model.MockAPIListContacts, *model.ErrorResponse) {
+func GetListContacts() (*model.MockAPIListContacts, *model.ErrorResponse) {
 	log.Info("getListContacts")
 
 	var mockAPIListContacts model.MockAPIListContacts
