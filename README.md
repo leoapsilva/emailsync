@@ -11,11 +11,13 @@ Please refer to the [Techincal Design](https://docs.google.com/document/d/1Ux-Ch
 The directory ``/doc`` is a OpenAPI specification of the API of **emailsync**.
 
 You can access the API documentation and use it as a client when your service is running:
- - just type the service URL + ``/doc`` on your browser.
+ - just type the service URL + ``/doc`` on your browser
+ - avaiable when running on your local machine, not a serverless version.
 
 You also can use OpenAPI specs in a variety of ways:
 - Using as a test client on VS Code
-  - Using extension from [philosowaffle.openapi-designer](https://marketplace.visualstudio.com/items?itemName=philosowaffle.openapi-designer)
+  - Using extension from [openapi-designer](https://marketplace.visualstudio.com/items?itemName=philosowaffle.openapi-designer)
+  - And [OpenAPI (Swagger Editor)](https://marketplace.visualstudio.com/items?itemName=42Crunch.vscode-openapi)
 - Import to Postman
 - Generate test cases using OpenAPI Spec (stop writing tests!)
   - On Postman \([here is a tutorial](https://www.postman.com/postman-galaxy/dynamically-generate-tests-from-open-api-specs/)\)    
