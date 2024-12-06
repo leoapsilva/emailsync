@@ -3,7 +3,6 @@ package mailchimp
 import (
 	"emailsync/config"
 	"emailsync/model"
-	"encoding/json"
 	"reflect"
 	"testing"
 )
@@ -12,7 +11,7 @@ func Test_addListMember(t *testing.T) {
 	config.LoadEnvVariables()
 
 	type args struct {
-		member json.RawMessage
+		member *model.MailchimpMember
 	}
 	tests := []struct {
 		name    string
@@ -23,7 +22,13 @@ func Test_addListMember(t *testing.T) {
 		{
 			name: "Add a email address twice",
 			args: args{
-				member: []byte(`{"email_address":"Terrance342@hotmail.com","full_name":"Cole Zieme","email_type":"html","status":"subscribed","list_id":"5c2f756353"}`),
+				member: &model.MailchimpMember{
+					EmailAddress: "Terrance342@hotmail.com",
+					Status:       "subscribed",
+					ListId:       "5c2f756353",
+					FullName:     "Cole Zieme",
+					EmailType:    "html",
+				},
 			},
 			want: &model.MailchimpMember{
 				EmailAddress: "Terrance342@hotmail.com",

@@ -16,12 +16,12 @@ func Sync(c echo.Context) error {
 
 	var syncResponse *model.SyncResponse
 
-	mockAPIMapContacts, errorResponse := mockapi.GetMapContacts()
+	mapContacts, errorResponse := mockapi.GetMapContacts()
 	if errorResponse != nil {
 		return c.JSON(errorResponse.Status, errorResponse)
 	}
 
-	syncResponse = usecases.AddContacts(mockAPIMapContacts)
+	syncResponse = usecases.AddContacts(mapContacts)
 
 	response, err := json.Marshal(syncResponse)
 	if err != nil {

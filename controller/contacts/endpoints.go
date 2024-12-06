@@ -6,7 +6,7 @@ import (
 
 const (
 	RouteContactsSync string = "/contacts/sync"
-	RouteContactsAdd  string = "/contacts/add"
+	RouteContactsAdd  string = "/contacts/add" //included for tests purposes
 )
 
 func ConfigServerEndpoints(g *echo.Group) {
