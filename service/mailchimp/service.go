@@ -4,6 +4,7 @@ import (
 	"emailsync/config"
 	"emailsync/model"
 	"emailsync/service"
+	"emailsync/utils"
 	"encoding/json"
 	"net/http"
 
@@ -25,7 +26,7 @@ func getListMembers() (*model.MailchimpListMembers, *model.ErrorResponse) {
 
 	mailchimpAPI := service.NewWithConnection(model.Connection{URL: APIURL})
 
-	APIKey, err := config.DecodeBase64(config.GetEnvVariable("MAILCHIMP_API_KEY"))
+	APIKey, err := utils.DecodeBase64(config.GetEnvVariable("MAILCHIMP_API_KEY"))
 	if err != nil {
 		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error decoding Mailchimp API Key")
 		return nil, errorResponse
@@ -61,16 +62,22 @@ func getListMembers() (*model.MailchimpListMembers, *model.ErrorResponse) {
 	return &mailchimpListMembers, nil
 }
 
-func addListMember(member json.RawMessage) (*model.MailchimpMember, *model.ErrorResponse) {
+func addListMember(member *model.MailchimpMember) (*model.MailchimpMember, *model.ErrorResponse) {
 	log.Info("addListMember")
 
-	var mailchimpMember model.MailchimpMember
+	var addedMailchimpMember model.MailchimpMember
+
+	addingMember, err := json.Marshal(member)
+	if err != nil {
+		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal Mailchimp Member")
+		return nil, errorResponse
+	}
 
 	APIURL := config.GetEnvVariable("MAILCHIMP_API_URL")
 
 	mailchimpAPI := service.NewWithConnection(model.Connection{URL: APIURL})
 
-	APIKey, err := config.DecodeBase64(config.GetEnvVariable("MAILCHIMP_API_KEY"))
+	APIKey, err := utils.DecodeBase64(config.GetEnvVariable("MAILCHIMP_API_KEY"))
 	if err != nil {
 		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error decoding Mailchimp API Key")
 		return nil, errorResponse
@@ -81,8 +88,7 @@ func addListMember(member json.RawMessage) (*model.MailchimpMember, *model.Error
 		"list_id": config.GetEnvVariable("MAILCHIMP_LIST_ID"),
 	}
 
-	response, err := mailchimpAPI.SetPathParams(pathParams).
-		Post(ListMembersEndpoint, member)
+	response, err := mailchimpAPI.SetPathParams(pathParams).Post(ListMembersEndpoint, addingMember)
 
 	log.Debug(string(response))
 
@@ -91,13 +97,13 @@ func addListMember(member json.RawMessage) (*model.MailchimpMember, *model.Error
 		return nil, errorResponse
 	}
 
-	err = json.Unmarshal(response, &mailchimpMember)
+	err = json.Unmarshal(response, &addedMailchimpMember)
 	if err != nil {
 		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal Mailchimp Member")
 		return nil, errorResponse
 	}
 
-	return &mailchimpMember, nil
+	return &addedMailchimpMember, nil
 
 }
 
@@ -107,7 +113,7 @@ func archiveMember(memberId string) *model.ErrorResponse {
 
 	mailchimpAPI := service.NewWithConnection(model.Connection{URL: APIURL})
 
-	APIKey, err := config.DecodeBase64(config.GetEnvVariable("MAILCHIMP_API_KEY"))
+	APIKey, err := utils.DecodeBase64(config.GetEnvVariable("MAILCHIMP_API_KEY"))
 	if err != nil {
 		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error decoding Mailchimp API Key")
 		return errorResponse
@@ -137,28 +143,11 @@ func AddContact(contact *model.Contact) *model.ErrorResponse {
 
 	errorResponse := new(model.ErrorResponse)
 
-	member := &model.MailchimpMember{
-		ListId:       config.GetEnvVariable("MAILCHIMP_LIST_ID"),
-		EmailAddress: contact.Email,
-		FullName:     contact.FirstName + " " + contact.LastName,
-		Status:       "subscribed",
-		EmailType:    "html",
-		MergeFields: model.MergeFields{
-			FName: contact.FirstName,
-			LName: contact.LastName,
-		},
-	}
-
-	payload, err := json.Marshal(member)
-	if err != nil {
-		errorResponse := model.SetErrorResponse(err.Error(), http.StatusInternalServerError, "Error Unmarshal Mailchimp Member")
-		return errorResponse
-	}
+	member := contact.ToMailchimpMember()
 
 	log.Infof("Adding contact [%s] added to Mailchimp List.", contact.Email)
-	log.Infof("%s", payload)
 
-	_, errorResponse = addListMember(payload)
+	_, errorResponse = addListMember(member)
 	if errorResponse != nil {
 		return errorResponse
 	}

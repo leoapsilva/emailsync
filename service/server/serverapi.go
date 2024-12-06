@@ -1,4 +1,4 @@
-package core
+package service
 
 import (
 	"emailsync/config"
@@ -9,17 +9,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Server struct {
+type ServerAPI struct {
 	*echo.Echo
 }
 
-func New() *Server {
-	return &Server{
+func New() *ServerAPI {
+	return &ServerAPI{
 		Echo: echo.New(),
 	}
 }
 
-func (server *Server) LoadDefault() *Server {
+func (server *ServerAPI) LoadDefault() *ServerAPI {
 	server.Debug = true
 	server.HideBanner = true
 	log.SetReportCaller(true)
@@ -34,13 +34,13 @@ func (server *Server) LoadDefault() *Server {
 	return server.CreateGroupV1()
 }
 
-func (server *Server) CreateGroupV1() *Server {
+func (server *ServerAPI) CreateGroupV1() *ServerAPI {
 	v1 := server.Group("")
 	controller.ConfigServerEndpoints(v1)
 	return server
 }
 
-func (server *Server) StartLocalAPI() {
+func (server *ServerAPI) StartLocalAPI() {
 	config.LoadEnvVariables()
 	log.Infof("Starting service on port [%s]", config.GetEnvVariable("SERVER_PORT"))
 

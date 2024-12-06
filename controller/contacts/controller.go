@@ -3,6 +3,7 @@ package contacts
 import (
 	"emailsync/model"
 	"emailsync/service/mockapi"
+	"emailsync/usecases"
 	"encoding/json"
 	"net/http"
 
@@ -20,7 +21,7 @@ func Sync(c echo.Context) error {
 		return c.JSON(errorResponse.Status, errorResponse)
 	}
 
-	syncResponse = addContact(mockAPIMapContacts)
+	syncResponse = usecases.AddContacts(mockAPIMapContacts)
 
 	response, err := json.Marshal(syncResponse)
 	if err != nil {
@@ -42,9 +43,9 @@ func Add(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errorResponse)
 	}
 
-	mockAPIMapContacts := listContacts.ToMapContacts()
+	mapContacts := listContacts.ToMapContacts()
 
-	syncResponse = addContact(mockAPIMapContacts)
+	syncResponse = usecases.AddContacts(mapContacts)
 
 	response, err := json.Marshal(syncResponse)
 	if err != nil {

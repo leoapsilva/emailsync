@@ -1,15 +1,14 @@
 package cli
 
 import (
-	"emailsync/core"
+	"emailsync/service/server"
 
-	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 )
 
 func Start() {
 	log.Info("Starting web server...")
-	api := &core.Server{Echo: echo.New()}
+	api := server.New()
 	log.Info("[Success] Web server started.")
 	api.LoadDefault().StartLocalAPI()
 

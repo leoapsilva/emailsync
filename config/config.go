@@ -1,8 +1,6 @@
 package config
 
 import (
-	"encoding/base64"
-	"fmt"
 	"os"
 )
 
@@ -19,19 +17,4 @@ func LoadEnvVariables() {
 
 func GetEnvVariable(key string) string {
 	return os.Getenv(key)
-}
-
-func EncodeBase64(str string) string {
-	return base64.RawStdEncoding.EncodeToString([]byte(str))
-}
-
-func DecodeBase64(s string) (string, error) {
-	ret, err := base64.StdEncoding.DecodeString(s)
-	if err != nil {
-		ret, err = base64.RawStdEncoding.DecodeString(s)
-		if err != nil {
-			return "", fmt.Errorf("erro [%s] ao decodificar os dados de base64", err.Error())
-		}
-	}
-	return fmt.Sprintf("%s", ret), nil
 }

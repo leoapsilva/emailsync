@@ -1,21 +1,21 @@
-package contacts
+package usecases
 
 import (
 	"emailsync/model"
 	"emailsync/service/mailchimp"
 
-	"github.com/labstack/gommon/log"
+	log "github.com/sirupsen/logrus"
 )
 
-func addContact(mockAPIMapContacts *model.MapContacts) *model.SyncResponse {
+func AddContacts(mapContacts *model.MapContacts) *model.SyncResponse {
 
 	var syncedContacts model.MapContacts
 	var syncResponse model.SyncResponse
 
-	syncedContacts = *mockAPIMapContacts
+	syncedContacts = *mapContacts
 
 	added := 0
-	for _, contact := range *mockAPIMapContacts {
+	for _, contact := range *mapContacts {
 		errorResponse := mailchimp.AddContact(&contact)
 
 		if errorResponse != nil {
@@ -26,7 +26,7 @@ func addContact(mockAPIMapContacts *model.MapContacts) *model.SyncResponse {
 		}
 	}
 
-	log.Infof("Synced [%d] from total of [%d]", added, mockAPIMapContacts.Length())
+	log.Infof("Synced [%d] from total of [%d]", added, mapContacts.Length())
 
 	syncResponse.SyncedContacts = added
 	for _, contact := range syncedContacts {
