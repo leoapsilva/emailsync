@@ -1,9 +1,9 @@
 package main
 
-import "emailsync/cli"
+import "emailsync/app"
 
 func main() {
 
-	cli.Start()
+	app.Start()
 
 }

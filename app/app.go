@@ -1,4 +1,4 @@
-package cli
+package app
 
 import (
 	"emailsync/service/server"
