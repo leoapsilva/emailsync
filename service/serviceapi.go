@@ -107,8 +107,7 @@ func newApi() *ServiceAPI {
 	return &s
 }
 
-func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (retorno json.RawMessage, err error) {
-	//func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage, pathParams map[string]string, queryParams map[string]string) (retorno json.RawMessage, err error) {
+func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (result json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
 	defer func() { cancel() }()
@@ -119,7 +118,7 @@ func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (retorno jso
 	resp, err := p.api.R().SetHeader("Content-Type", "application/json;charset=UTF-8").
 		SetBody(payload).
 		SetError(&err).
-		SetResult(&retorno).
+		SetResult(&result).
 		SetContext(ctx).
 		Post(p.con.FormatURL(endpoint))
 
@@ -161,7 +160,7 @@ func (p *ServiceAPI) Get(endpoint string) (retorno json.RawMessage, err error) {
 	return resp.Body(), err
 }
 
-func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage, pathParams map[string]string, queryParams map[string]string) (retorno json.RawMessage, err error) {
+func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage, pathParams map[string]string, queryParams map[string]string) (result json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
 	defer func() { cancel() }()
@@ -174,7 +173,7 @@ func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage, pathParams ma
 		SetPathParams(pathParams).
 		SetBody(payload).
 		SetError(&err).
-		SetResult(&retorno).
+		SetResult(&result).
 		SetContext(ctx).
 		Put(p.con.FormatURL(endpoint))
 
@@ -190,7 +189,7 @@ func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage, pathParams ma
 	return resp.Body(), err
 }
 
-func (p *ServiceAPI) Delete(endpoint string, pathParams map[string]string, queryParams map[string]string) (retorno json.RawMessage, err error) {
+func (p *ServiceAPI) Delete(endpoint string, pathParams map[string]string, queryParams map[string]string) (result json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
 	defer func() { cancel() }()
@@ -202,13 +201,13 @@ func (p *ServiceAPI) Delete(endpoint string, pathParams map[string]string, query
 		SetQueryParams(queryParams).
 		SetPathParams(pathParams).
 		SetError(&err).
-		SetResult(&retorno).
+		SetResult(&result).
 		SetContext(ctx).
 		Delete(p.con.FormatURL(endpoint))
 
 	if resp != nil {
 		statusCode := resp.StatusCode()
-		if statusCode != http.StatusOK {
+		if statusCode != http.StatusNoContent {
 			if err != nil {
 				log.Error("Error on DELETE [" + err.Error() + "]")
 				return resp.Body(), err
