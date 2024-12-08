@@ -13,20 +13,19 @@ import (
 func GetMapContacts() (*model.MapContacts, *model.ErrorResponse) {
 	log.Info("GetMapContacts")
 
-	mockAPIListContacts, errorResponse := GetListContacts()
+	listContacts, errorResponse := GetListContacts()
 	if errorResponse != nil {
 		return nil, errorResponse
 	}
 
-	retMapContacts := mockAPIListContacts.ToMapContacts()
+	retMapContacts := listContacts.ToMapContacts()
 
 	log.Infof("Got [%d] contacts", retMapContacts.Length())
-	log.Debugf("Got [%d] contacts: %v", retMapContacts.Length(), *retMapContacts)
 
 	return retMapContacts, nil
 }
 
-func GetListContacts() (*model.MockAPIListContacts, *model.ErrorResponse) {
+func GetListContacts() (*model.ListContacts, *model.ErrorResponse) {
 	log.Info("getListContacts")
 
 	var mockAPIListContacts model.MockAPIListContacts
@@ -49,5 +48,5 @@ func GetListContacts() (*model.MockAPIListContacts, *model.ErrorResponse) {
 		return nil, errorResponse
 	}
 
-	return &mockAPIListContacts, nil
+	return mockAPIListContacts.ToListContacts(), nil
 }

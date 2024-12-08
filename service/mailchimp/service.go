@@ -90,12 +90,12 @@ func addListMember(member *model.MailchimpMember) (*model.MailchimpMember, *mode
 
 	response, err := mailchimpAPI.SetPathParams(pathParams).Post(ListMembersEndpoint, addingMember)
 
-	log.Debug(string(response))
-
 	if err != nil {
 		errorResponse := model.GetErrorResponse(response)
 		return nil, errorResponse
 	}
+
+	log.Debug(string(response))
 
 	err = json.Unmarshal(response, &addedMailchimpMember)
 	if err != nil {
@@ -128,17 +128,17 @@ func archiveMember(memberId string) *model.ErrorResponse {
 
 	response, err := mailchimpAPI.Delete(ListMemberEndpoint, pathParams, map[string]string{})
 
-	log.Debug(string(response))
-
 	if err != nil {
 		errorResponse := model.GetErrorResponse(response)
 		return errorResponse
 	}
 
+	log.Debug(string(response))
+
 	return nil
 }
 
-func AddContact(contact *model.Contact) *model.ErrorResponse {
+func AddContact(contact *model.Contact) (*model.Contact, *model.ErrorResponse) {
 	log.Info("AddContact")
 
 	errorResponse := new(model.ErrorResponse)
@@ -147,14 +147,14 @@ func AddContact(contact *model.Contact) *model.ErrorResponse {
 
 	log.Infof("Adding contact [%s] added to Mailchimp List.", contact.Email)
 
-	_, errorResponse = addListMember(member)
+	mailchimpMember, errorResponse := addListMember(member)
 	if errorResponse != nil {
-		return errorResponse
+		return nil, errorResponse
 	}
 
-	log.Infof("Contact [%s] added to Mailchimp List.", contact.Email)
+	log.Infof("Contact [%s] added to Mailchimp List.", mailchimpMember.EmailAddress)
 
-	return nil
+	return mailchimpMember.ToContact(), nil
 }
 
 func GetMapContacts() (*model.MapContacts, *model.ErrorResponse) {
@@ -172,20 +172,13 @@ func GetMapContacts() (*model.MapContacts, *model.ErrorResponse) {
 	return retMapContacts, nil
 }
 
-func ArchiveAllMembers() *model.ErrorResponse {
+func ArchiveContact(contact *model.Contact) *model.ErrorResponse {
 
-	mailchimpListMembers, errorResponse := getListMembers()
+	errorResponse := archiveMember(contact.Email)
 	if errorResponse != nil {
 		return errorResponse
 	}
-
-	for _, member := range mailchimpListMembers.Members {
-		errorResponse = archiveMember(member.Id)
-		if errorResponse != nil {
-			return errorResponse
-		}
-		log.Infof("Archiving member [%s]", member.EmailAddress)
-	}
+	log.Infof("Archiving contact [%s]", contact.Email)
 
 	return nil
 }
