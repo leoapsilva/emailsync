@@ -70,3 +70,13 @@ func (l *MailchimpListMembers) ToMapContacts() *MapContacts {
 
 	return &retMapContacts
 }
+
+func (m *MailchimpMember) ToContact() *Contact {
+	contact := &Contact{
+		FirstName: m.MergeFields.FName,
+		LastName:  m.MergeFields.LName,
+		Email:     m.EmailAddress,
+	}
+
+	return contact
+}

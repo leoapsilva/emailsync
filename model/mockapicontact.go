@@ -25,3 +25,19 @@ func (l *MockAPIListContacts) ToMapContacts() *MapContacts {
 
 	return &retMapContacts
 }
+
+func (l *MockAPIListContacts) ToListContacts() *ListContacts {
+
+	var retListContacts ListContacts
+
+	for _, mockAPIContact := range *l {
+		retListContacts = append(retListContacts,
+			Contact{
+				FirstName: mockAPIContact.FirstName,
+				LastName:  mockAPIContact.LastName,
+				Email:     mockAPIContact.Email,
+			})
+	}
+
+	return &retListContacts
+}
