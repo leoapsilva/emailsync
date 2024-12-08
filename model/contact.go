@@ -1,6 +1,10 @@
 package model
 
-import "emailsync/config"
+import (
+	"emailsync/config"
+	"emailsync/utils"
+	"net/http"
+)
 
 type Contact struct {
 	FirstName string `json:"firstName"`
@@ -9,6 +13,10 @@ type Contact struct {
 }
 
 func (contact *Contact) ToMailchimpMember() *MailchimpMember {
+
+	if ok, _ := contact.Validate(); !ok {
+		return nil
+	}
 
 	member := &MailchimpMember{
 		ListId:       config.GetEnvVariable("MAILCHIMP_LIST_ID"),
@@ -23,4 +31,24 @@ func (contact *Contact) ToMailchimpMember() *MailchimpMember {
 	}
 
 	return member
+}
+
+func (contact *Contact) Validate() (bool, *ErrorResponse) {
+
+	if !utils.EmailValidation(contact.Email) {
+		errorResponse := SetErrorResponse("Malformed email address", http.StatusUnprocessableEntity, "Invalid email address")
+		return false, errorResponse
+	}
+
+	if contact.FirstName == "" {
+		errorResponse := SetErrorResponse("First name cannot be empty", http.StatusUnprocessableEntity, "First name empty")
+		return false, errorResponse
+	}
+
+	if contact.LastName == "" {
+		errorResponse := SetErrorResponse("Last name cannot be empty", http.StatusUnprocessableEntity, "Last name empty")
+		return false, errorResponse
+	}
+
+	return true, nil
 }
