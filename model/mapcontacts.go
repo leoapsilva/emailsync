@@ -19,3 +19,13 @@ func (thisMap *MapContacts) SetDifference(otherMap *MapContacts) *MapContacts {
 func (m *MapContacts) Length() int {
 	return len(map[string]Contact(*m))
 }
+
+func (m *MapContacts) ToListContacts() *ListContacts {
+
+	var listContacts ListContacts
+	for _, contact := range *m {
+		listContacts = append(listContacts, contact)
+	}
+
+	return &listContacts
+}

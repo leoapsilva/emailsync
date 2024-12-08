@@ -16,12 +16,12 @@ func Sync(c echo.Context) error {
 
 	var syncResponse *model.SyncResponse
 
-	mapContacts, errorResponse := mockapi.GetMapContacts()
+	listContacts, errorResponse := mockapi.GetListContacts()
 	if errorResponse != nil {
 		return c.JSON(errorResponse.Status, errorResponse)
 	}
 
-	syncResponse = usecases.AddContacts(mapContacts)
+	syncResponse = usecases.AddContacts(listContacts)
 
 	response, err := json.Marshal(syncResponse)
 	if err != nil {
@@ -34,7 +34,7 @@ func Sync(c echo.Context) error {
 
 func Add(c echo.Context) error {
 
-	var listContacts model.ListContacts
+	var listContacts *model.ListContacts
 	var syncResponse *model.SyncResponse
 
 	err := c.Bind(&listContacts)
@@ -43,9 +43,7 @@ func Add(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errorResponse)
 	}
 
-	mapContacts := listContacts.ToMapContacts()
-
-	syncResponse = usecases.AddContacts(mapContacts)
+	syncResponse = usecases.AddContacts(listContacts)
 
 	response, err := json.Marshal(syncResponse)
 	if err != nil {

@@ -7,28 +7,24 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func AddContacts(mapContacts *model.MapContacts) *model.SyncResponse {
+func AddContacts(listContacts *model.ListContacts) *model.SyncResponse {
 
-	var syncedContacts model.MapContacts
+	var syncedContacts model.ListContacts
 	var syncResponse model.SyncResponse
 
-	syncedContacts = *mapContacts
-
-	added := 0
-	for _, contact := range *mapContacts {
-		errorResponse := mailchimp.AddContact(&contact)
+	for _, contact := range *listContacts {
+		addedContact, errorResponse := mailchimp.AddContact(&contact)
 
 		if errorResponse != nil {
 			log.Errorf("Error on add contact: %s", errorResponse.Detail)
-			delete(syncedContacts, contact.Email)
 		} else {
-			added = added + 1
+			syncedContacts = append(syncedContacts, *addedContact)
 		}
 	}
 
-	log.Infof("Synced [%d] from total of [%d]", added, mapContacts.Length())
+	log.Infof("Synced [%d] from total of [%d]", len(syncedContacts), len(*listContacts))
 
-	syncResponse.SyncedContacts = added
+	syncResponse.SyncedContacts = len(syncedContacts)
 	for _, contact := range syncedContacts {
 		syncResponse.Contacts = append(syncResponse.Contacts, contact)
 	}
