@@ -7,11 +7,11 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	resty "github.com/go-resty/resty/v2"
-	"github.com/labstack/gommon/log"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -38,7 +38,7 @@ type ServiceAPI struct {
 
 func (p *ServiceAPI) EnableDebug() {
 	p.api.SetDebug(true)
-	p.api.SetLogger(logrus.StandardLogger())
+	p.api.SetLogger(log.StandardLogger())
 }
 
 func (p *ServiceAPI) SetDebug(debug bool) {
@@ -110,7 +110,12 @@ func newApi() *ServiceAPI {
 func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (result json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
-	defer func() { cancel() }()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("Recovered. Error:\n", r)
+		}
+		cancel()
+	}()
 
 	p.api.RetryConditions = nil
 	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
@@ -122,13 +127,25 @@ func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (result json
 		SetContext(ctx).
 		Post(p.con.FormatURL(endpoint))
 
-	statusCode := resp.StatusCode()
-	if statusCode != http.StatusOK {
-		if err != nil {
-			log.Error("Error on POST [" + err.Error() + "]")
-			return resp.Body(), err
+	if err != nil {
+		log.Error("Error on POST [" + err.Error() + "]")
+		errorResponse := model.ErrorResponse{
+			Title:  err.Error(),
+			Status: http.StatusBadRequest,
+			Detail: resp.String(),
 		}
-		return resp.Body(), errors.New("status != OK")
+		return *errorResponse.ToJsonRawMessage(), errors.New(err.Error())
+	} else {
+		statusCode := resp.StatusCode()
+		if statusCode != http.StatusOK {
+			errorMessage := "Status Code: " + strconv.Itoa(resp.StatusCode()) + ", Status: " + resp.Status()
+			errorResponse := model.ErrorResponse{
+				Title:  resp.Status(),
+				Status: statusCode,
+				Detail: resp.String(),
+			}
+			return *errorResponse.ToJsonRawMessage(), errors.New(errorMessage)
+		}
 	}
 
 	return resp.Body(), err
@@ -137,7 +154,12 @@ func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (result json
 func (p *ServiceAPI) Get(endpoint string) (retorno json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
-	defer func() { cancel() }()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("Recovered. Error:\n", r)
+		}
+		cancel()
+	}()
 
 	p.api.RetryConditions = nil
 	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
@@ -148,13 +170,25 @@ func (p *ServiceAPI) Get(endpoint string) (retorno json.RawMessage, err error) {
 		SetContext(ctx).
 		Get(p.con.FormatURL(endpoint))
 
-	statusCode := resp.StatusCode()
-	if statusCode != http.StatusOK {
-		if err != nil {
-			log.Error("Error on GET [" + err.Error() + "]")
-			return resp.Body(), err
+	if err != nil {
+		log.Error("Error on GET [" + err.Error() + "]")
+		errorResponse := model.ErrorResponse{
+			Title:  err.Error(),
+			Status: http.StatusBadRequest,
+			Detail: resp.String(),
 		}
-		return resp.Body(), errors.New("status != OK")
+		return *errorResponse.ToJsonRawMessage(), errors.New(err.Error())
+	} else {
+		statusCode := resp.StatusCode()
+		if statusCode != http.StatusOK {
+			errorMessage := "Status Code: " + strconv.Itoa(resp.StatusCode()) + ", Status: " + resp.Status()
+			errorResponse := model.ErrorResponse{
+				Title:  resp.Status(),
+				Status: statusCode,
+				Detail: resp.String(),
+			}
+			return *errorResponse.ToJsonRawMessage(), errors.New(errorMessage)
+		}
 	}
 
 	return resp.Body(), err
@@ -163,7 +197,12 @@ func (p *ServiceAPI) Get(endpoint string) (retorno json.RawMessage, err error) {
 func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage, pathParams map[string]string, queryParams map[string]string) (result json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
-	defer func() { cancel() }()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("Recovered. Error:\n", r)
+		}
+		cancel()
+	}()
 
 	p.api.RetryConditions = nil
 	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
@@ -177,13 +216,25 @@ func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage, pathParams ma
 		SetContext(ctx).
 		Put(p.con.FormatURL(endpoint))
 
-	statusCode := resp.StatusCode()
-	if statusCode != http.StatusOK {
-		if err != nil {
-			log.Error("Error on PUT [" + err.Error() + "]")
-			return resp.Body(), err
+	if err != nil {
+		log.Error("Error on PUT [" + err.Error() + "]")
+		errorResponse := model.ErrorResponse{
+			Title:  err.Error(),
+			Status: http.StatusBadRequest,
+			Detail: err.Error(),
 		}
-		return resp.Body(), errors.New("status != OK")
+		return *errorResponse.ToJsonRawMessage(), errors.New(err.Error())
+	} else {
+		statusCode := resp.StatusCode()
+		if statusCode != http.StatusOK {
+			errorMessage := "Status Code: " + strconv.Itoa(resp.StatusCode()) + ", Status: " + resp.Status()
+			errorResponse := model.ErrorResponse{
+				Title:  resp.Status(),
+				Status: statusCode,
+				Detail: resp.String(),
+			}
+			return *errorResponse.ToJsonRawMessage(), errors.New(errorMessage)
+		}
 	}
 
 	return resp.Body(), err
@@ -192,7 +243,12 @@ func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage, pathParams ma
 func (p *ServiceAPI) Delete(endpoint string, pathParams map[string]string, queryParams map[string]string) (result json.RawMessage, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), Timeout2M)
-	defer func() { cancel() }()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("Recovered. Error:\n", r)
+		}
+		cancel()
+	}()
 
 	p.api.RetryConditions = nil
 	p.api.SetRetryCount(3).SetRetryWaitTime(Timeout2s).SetRetryMaxWaitTime(Timeout10s).AddRetryCondition(DefaultRetryCondition)
@@ -205,14 +261,24 @@ func (p *ServiceAPI) Delete(endpoint string, pathParams map[string]string, query
 		SetContext(ctx).
 		Delete(p.con.FormatURL(endpoint))
 
-	if resp != nil {
+	if err != nil {
+		log.Error("Error on DELETE [" + err.Error() + "]")
+		errorResponse := model.ErrorResponse{
+			Title:  err.Error(),
+			Status: http.StatusBadRequest,
+			Detail: resp.String(),
+		}
+		return *errorResponse.ToJsonRawMessage(), errors.New(err.Error())
+	} else {
 		statusCode := resp.StatusCode()
-		if statusCode != http.StatusNoContent {
-			if err != nil {
-				log.Error("Error on DELETE [" + err.Error() + "]")
-				return resp.Body(), err
+		if statusCode != http.StatusOK {
+			errorMessage := "Status Code: " + strconv.Itoa(resp.StatusCode()) + ", Status: " + resp.Status()
+			errorResponse := model.ErrorResponse{
+				Title:  resp.Status(),
+				Status: statusCode,
+				Detail: resp.String(),
 			}
-			return resp.Body(), errors.New("status != OK")
+			return *errorResponse.ToJsonRawMessage(), errors.New(errorMessage)
 		}
 	}
 

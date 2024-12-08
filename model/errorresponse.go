@@ -3,6 +3,8 @@ package model
 import (
 	"encoding/json"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type ErrorResponse struct {
@@ -29,4 +31,14 @@ func SetErrorResponse(detail string, status int, title string) *ErrorResponse {
 	e.Status = status
 	e.Title = title
 	return e
+}
+
+func (e *ErrorResponse) ToJsonRawMessage() *json.RawMessage {
+	response, err := json.Marshal(e)
+	if err != nil {
+		log.Error(err)
+		return nil
+	}
+
+	return (*json.RawMessage)(&response)
 }
