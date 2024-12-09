@@ -143,6 +143,12 @@ func AddContact(contact *model.Contact) (*model.Contact, *model.ErrorResponse) {
 
 	errorResponse := new(model.ErrorResponse)
 
+	valid, errorResponse := contact.Validate()
+	if !valid {
+		log.Errorf("Error on add contact: %s", errorResponse.Detail)
+		return nil, errorResponse
+	}
+
 	member := contact.ToMailchimpMember()
 
 	log.Infof("Adding contact [%s] added to Mailchimp List.", contact.Email)
