@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"runtime/debug"
 	"strconv"
 	"time"
 
@@ -113,6 +114,7 @@ func (p *ServiceAPI) Post(endpoint string, payload json.RawMessage) (result json
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println("Recovered. Error:\n", r)
+			debug.PrintStack()
 		}
 		cancel()
 	}()
@@ -136,6 +138,7 @@ func (p *ServiceAPI) Get(endpoint string) (retorno json.RawMessage, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println("Recovered. Error:\n", r)
+			debug.PrintStack()
 		}
 		cancel()
 	}()
@@ -158,6 +161,7 @@ func (p *ServiceAPI) Put(endpoint string, payload json.RawMessage, pathParams ma
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println("Recovered. Error:\n", r)
+			debug.PrintStack()
 		}
 		cancel()
 	}()
@@ -183,6 +187,7 @@ func (p *ServiceAPI) Delete(endpoint string, pathParams map[string]string, query
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println("Recovered. Error:\n", r)
+			debug.PrintStack()
 		}
 		cancel()
 	}()
@@ -203,16 +208,26 @@ func (p *ServiceAPI) Delete(endpoint string, pathParams map[string]string, query
 
 func handleResponse(resp *resty.Response, err error) (json.RawMessage, error) {
 	if err != nil {
-		errorResponse := model.GetErrorResponse(resp.Body())
-		if errorResponse == nil {
-			log.Error("Error on " + resp.Request.Method + " [" + err.Error() + "]")
-			errorResponse = &model.ErrorResponse{
+		if resp != nil {
+			errorResponse := model.GetErrorResponse(resp.Body())
+			if errorResponse == nil {
+				log.Error("Error on " + resp.Request.Method + " [" + err.Error() + "]")
+				errorResponse = &model.ErrorResponse{
+					Title:  err.Error(),
+					Status: http.StatusBadRequest,
+					Detail: resp.String(),
+				}
+			}
+			return *errorResponse.ToJsonRawMessage(), errors.New(err.Error())
+		} else {
+			log.Error("Error [" + err.Error() + "]")
+			errorResponse := &model.ErrorResponse{
 				Title:  err.Error(),
 				Status: http.StatusBadRequest,
-				Detail: resp.String(),
+				Detail: err.Error(),
 			}
+			return *errorResponse.ToJsonRawMessage(), errors.New(err.Error())
 		}
-		return *errorResponse.ToJsonRawMessage(), errors.New(err.Error())
 	} else {
 		statusCode := resp.StatusCode()
 		if statusCode >= http.StatusMultipleChoices {
