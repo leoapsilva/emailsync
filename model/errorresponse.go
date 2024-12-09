@@ -17,8 +17,12 @@ func GetErrorResponse(response json.RawMessage) *ErrorResponse {
 	err := json.Unmarshal(response, e)
 	if err != nil {
 		log.Error(err.Error())
-		return e
+		return nil
 	}
+	if e.Status == 0 {
+		return nil
+	}
+
 	return e
 }
 

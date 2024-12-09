@@ -4,6 +4,7 @@ go 1.21.4
 
 require (
 	github.com/go-resty/resty/v2 v2.16.2
+	github.com/janosgyerik/portping v1.0.1
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/sirupsen/logrus v1.9.3
 )

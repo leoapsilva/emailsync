@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func Test_AddContactsTwice(t *testing.T) {
+func Test_CheckSyncAddingContactsTwice(t *testing.T) {
 
 	var listContacts model.ListContacts
 	var syncResponse model.SyncResponse
@@ -15,26 +15,30 @@ func Test_AddContactsTwice(t *testing.T) {
 
 	StartServer()
 
-	responseSyncEndpoint, err = GetSyncEndpoint()
-	if err != nil {
-		t.Error(err)
-	}
+	SetupClient()
+	t.Run("Checking /contacts/sync adding contacts twice ", func(t *testing.T) {
 
-	err = json.Unmarshal(responseSyncEndpoint, &syncResponse)
-	if err != nil {
-		t.Error(err)
-	}
+		responseSyncEndpoint, err = GetSyncEndpoint()
+		if err != nil {
+			t.Error(err)
+		}
 
-	if len(syncResponse.Contacts) != 24 {
-		t.Errorf("SyncedContacts: expected 24, got %d", len(syncResponse.Contacts))
-	}
+		err = json.Unmarshal(responseSyncEndpoint, &syncResponse)
+		if err != nil {
+			t.Error(err)
+		}
 
-	listContacts = syncResponse.Contacts
-	checkAddContactsResponse := usecases.AddContacts(&listContacts)
+		if len(syncResponse.Contacts) != 24 {
+			t.Errorf("SyncedContacts: expected 24, got %d", len(syncResponse.Contacts))
+		}
 
-	if checkAddContactsResponse.SyncedContacts != 0 {
-		t.Errorf("SyncedContacts: expected 0, got %d", checkAddContactsResponse.SyncedContacts)
-	}
+		listContacts = syncResponse.Contacts
+		checkAddContactsResponse := usecases.AddContacts(&listContacts)
 
-	t.Cleanup(ArchiveContacts)
+		if checkAddContactsResponse.SyncedContacts != 0 {
+			t.Errorf("SyncedContacts: expected 0, got %d", checkAddContactsResponse.SyncedContacts)
+		}
+
+		t.Cleanup(ArchiveContacts)
+	})
 }

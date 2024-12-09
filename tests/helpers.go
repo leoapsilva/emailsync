@@ -6,6 +6,7 @@ import (
 	"emailsync/model"
 	"emailsync/service"
 	"emailsync/service/mailchimp"
+	"emailsync/service/server"
 	"encoding/json"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 var responseSyncEndpoint json.RawMessage
 var serverPort string
 var localAPI *service.ServiceAPI
+var serverAPI *server.ServerAPI
 
 func SetupClient() {
 	config.LoadEnvVariables()
@@ -24,7 +26,7 @@ func SetupClient() {
 
 func StartServer() {
 	go app.Start()
-	time.Sleep(service.Timeout2s)
+	time.Sleep(service.Timeout5s)
 }
 
 func GetSyncEndpoint() (json.RawMessage, error) {

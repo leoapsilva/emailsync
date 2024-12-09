@@ -3,7 +3,9 @@ package server
 import (
 	"emailsync/config"
 	"emailsync/controller"
+	"emailsync/service"
 
+	"github.com/janosgyerik/portping"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	log "github.com/sirupsen/logrus"
@@ -48,10 +50,17 @@ func (server *ServerAPI) CreateGroupV1() *ServerAPI {
 
 func (server *ServerAPI) StartLocalAPI() {
 	config.LoadEnvVariables()
-	log.Infof("Starting service on port [%s]", config.GetEnvVariable("SERVER_PORT"))
+	serverPort := config.GetEnvVariable("SERVER_PORT")
+	log.Infof("Starting service on port [%s]", serverPort)
 
-	server.Server.Addr = ":" + config.GetEnvVariable("SERVER_PORT")
-	if err := server.Start(server.Server.Addr); err != nil {
-		log.Error(err)
+	server.Server.Addr = ":" + serverPort
+	err := portping.Ping("tcp", server.Server.Addr, service.Timeout1s)
+	if err != nil {
+		if err := server.Start(server.Server.Addr); err != nil {
+			log.Error(err)
+		}
+	} else {
+		errMsg := "The port [" + serverPort + "] is already been used."
+		log.Errorf(errMsg)
 	}
 }
