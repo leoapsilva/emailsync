@@ -9,13 +9,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var serverAPI *ServerAPI
+
 type ServerAPI struct {
 	*echo.Echo
 }
 
 func New() *ServerAPI {
-	return &ServerAPI{
-		Echo: echo.New(),
+	if serverAPI != nil {
+		return &ServerAPI{
+			Echo: echo.New(),
+		}
+	} else {
+		return serverAPI
 	}
 }
 
