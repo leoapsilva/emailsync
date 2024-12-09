@@ -16,7 +16,7 @@ type ServerAPI struct {
 }
 
 func New() *ServerAPI {
-	if serverAPI != nil {
+	if serverAPI == nil {
 		return &ServerAPI{
 			Echo: echo.New(),
 		}
