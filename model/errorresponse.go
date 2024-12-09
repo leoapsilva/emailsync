@@ -2,7 +2,6 @@ package model
 
 import (
 	"encoding/json"
-	"net/http"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -17,9 +16,7 @@ func GetErrorResponse(response json.RawMessage) *ErrorResponse {
 	e := new(ErrorResponse)
 	err := json.Unmarshal(response, e)
 	if err != nil {
-		e.Detail = err.Error()
-		e.Status = http.StatusInternalServerError
-		e.Title = "Error Unmarshal Error Response"
+		log.Error(err.Error())
 		return e
 	}
 	return e

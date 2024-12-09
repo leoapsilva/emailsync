@@ -81,7 +81,7 @@ func Test_addListMember(t *testing.T) {
 			_, err := addListMember(tt.args.member)
 			if err != nil {
 				if !reflect.DeepEqual(err, tt.wantErrorResponse) {
-					t.Errorf("addListMember() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("addListMember() err = %v, wantErrorResponse %v", err, tt.wantErrorResponse)
 					return
 				}
 			}
