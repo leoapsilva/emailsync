@@ -19,6 +19,7 @@ You also can use OpenAPI specs in a variety of ways:
   - Using extension from [openapi-designer](https://marketplace.visualstudio.com/items?itemName=philosowaffle.openapi-designer)
   - And [OpenAPI (Swagger Editor)](https://marketplace.visualstudio.com/items?itemName=42Crunch.vscode-openapi)
 - Import to Postman
+- Import to Thunder Client
 - Generate test cases using OpenAPI Spec (stop writing tests!)
   - On Postman \([here is a tutorial](https://www.postman.com/postman-galaxy/dynamically-generate-tests-from-open-api-specs/)\)    
   - Using Python testRail \([here is a tutorial](https://www.youtube.com/watch?v=r9xnkv5WCYA&t=2215)\)

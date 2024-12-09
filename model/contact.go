@@ -14,10 +14,6 @@ type Contact struct {
 
 func (contact *Contact) ToMailchimpMember() *MailchimpMember {
 
-	if ok, _ := contact.Validate(); !ok {
-		return nil
-	}
-
 	member := &MailchimpMember{
 		ListId:       config.GetEnvVariable("MAILCHIMP_LIST_ID"),
 		EmailAddress: contact.Email,

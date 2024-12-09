@@ -25,9 +25,7 @@ func AddContacts(listContacts *model.ListContacts) *model.SyncResponse {
 	log.Infof("Synced [%d] from total of [%d]", len(syncedContacts), len(*listContacts))
 
 	syncResponse.SyncedContacts = len(syncedContacts)
-	for _, contact := range syncedContacts {
-		syncResponse.Contacts = append(syncResponse.Contacts, contact)
-	}
+	syncResponse.Contacts = syncedContacts
 
 	return &syncResponse
 }
